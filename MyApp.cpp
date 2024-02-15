@@ -67,6 +67,47 @@ struct Param
 	}
 };
 
+struct Sphere
+{
+	glm::vec3 GetPos(float u, float v) const noexcept
+	{
+
+		float a = u * 2 * M_PI;
+		float b = v * M_PI;
+
+		float r = 1;
+
+		float x = r * cos(a) * sin(b);
+		float y = r * sin(a) * sin(b);
+		float z = r * cos(b);
+
+		return glm::vec3(x, z, y);
+
+	}
+	glm::vec3 GetNorm(float u, float v) const noexcept
+	{
+		glm::vec3 p = GetPos(u, v);
+
+		float e = 0.01;
+
+		glm::vec3 u1 = GetPos(glm::clamp(u - e, 0.f, 1.f), v);
+		glm::vec3 u2 = GetPos(glm::clamp(u + e, 0.f, 1.f), v);
+
+		glm::vec3 t1 = u2 - u1;
+
+		glm::vec3 v1 = GetPos(u, glm::clamp(v - e, 0.f, 1.f));
+		glm::vec3 v2 = GetPos(u, glm::clamp(v + e, 0.f, 1.f));
+
+		glm::vec3 t2 = v2 - v1;
+
+		return normalize(glm::cross(t1, t2));
+	}
+	glm::vec2 GetTex(float u, float v) const noexcept
+	{
+		return glm::vec2(u, v);
+	}
+};
+
 void CMyApp::InitGeometry()
 {
 
@@ -79,12 +120,16 @@ void CMyApp::InitGeometry()
 
 	// Suzanne
 
-	MeshObject<Vertex> suzanneMeshCPU = ObjParser::parse("Assets/Suzanne.obj");
-	m_SuzanneGPU = CreateGLObjectFromMesh( suzanneMeshCPU, vertexAttribList );
+	/*MeshObject<Vertex> suzanneMeshCPU = ObjParser::parse("Assets/Suzanne.obj");
+	m_SuzanneGPU = CreateGLObjectFromMesh( suzanneMeshCPU, vertexAttribList );*/
 
 	// Parametrikus felület
-	MeshObject<Vertex> surfaceMeshCPU = GetParamSurfMesh( Param() );
-	m_surfaceGPU = CreateGLObjectFromMesh( surfaceMeshCPU, vertexAttribList );
+	/*MeshObject<Vertex> surfaceMeshCPU = GetParamSurfMesh(Param());
+	m_surfaceGPU = CreateGLObjectFromMesh( surfaceMeshCPU, vertexAttribList );*/
+
+	// Bolygó (gömb)
+	MeshObject<Vertex> planetMeshCPU = GetParamSurfMesh(Sphere());
+	m_planetGPU = CreateGLObjectFromMesh(planetMeshCPU, vertexAttribList);
 
 	// Skybox
 	InitSkyboxGeometry();
@@ -92,8 +137,9 @@ void CMyApp::InitGeometry()
 
 void CMyApp::CleanGeometry()
 {
-	CleanOGLObject( m_SuzanneGPU );
-	CleanOGLObject( m_surfaceGPU );
+//	CleanOGLObject( m_SuzanneGPU );
+//	CleanOGLObject( m_surfaceGPU );
+	CleanOGLObject( m_planetGPU );
 	CleanSkyboxGeometry();
 }
 
@@ -142,6 +188,19 @@ void CMyApp::InitSkyboxGeometry()
 	m_SkyboxGPU = CreateGLObjectFromMesh( skyboxCPU, { { 0, offsetof( glm::vec3,x ), 3, GL_FLOAT } } );
 }
 
+void CMyApp::RenderPlanet(glm::mat4 matWorld) {
+
+	glBindVertexArray(m_planetGPU.vaoID);
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glDrawElements(GL_TRIANGLES,
+		m_planetGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
+}
+
 void CMyApp::CleanSkyboxGeometry()
 {
 	CleanOGLObject( m_SkyboxGPU );
@@ -151,25 +210,32 @@ void CMyApp::InitTextures()
 {
 	// diffuse textures
 
-	glGenTextures( 1, &m_SuzanneTextureID );
+/*	glGenTextures(1, &m_SuzanneTextureID);
 	TextureFromFile( m_SuzanneTextureID, "Assets/wood.jpg" );
 	SetupTextureSampling( GL_TEXTURE_2D, m_SuzanneTextureID );
 
 	glGenTextures( 1, &m_surfaceTextureID );
 	TextureFromFile( m_surfaceTextureID, "Assets/color_checkerboard.png" );
-	SetupTextureSampling( GL_TEXTURE_2D, m_surfaceTextureID );
+	SetupTextureSampling( GL_TEXTURE_2D, m_surfaceTextureID );*/
 
 	// skybox texture
 
 	InitSkyboxTextures();
+
+	// bolygók textúrái
+	//sun.jpg – Nap textúrája
+	glGenTextures(1, &m_sunTextureID);
+	TextureFromFile(m_sunTextureID, "Assets/sun.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_sunTextureID);
 }
 
 void CMyApp::CleanTextures()
 {
 	// diffuse textures
 
-	glDeleteTextures( 1, &m_SuzanneTextureID );
-	glDeleteTextures( 1, &m_surfaceTextureID );
+//	glDeleteTextures( 1, &m_SuzanneTextureID );
+//	glDeleteTextures( 1, &m_surfaceTextureID );
+	glDeleteTextures(1, &m_sunTextureID);
 
 	// skybox texture
 
@@ -249,18 +315,18 @@ void CMyApp::Render()
 
 	// Suzanne
 
-	glBindVertexArray( m_SuzanneGPU.vaoID );
+	/*glBindVertexArray(m_SuzanneGPU.vaoID);
 
 	// - Textúrák beállítása, minden egységre külön
 	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, m_SuzanneTextureID );
+	glBindTexture( GL_TEXTURE_2D, m_SuzanneTextureID );*/
 
 	glUseProgram( m_programID );
 
 	glm::mat4 matWorld = glm::identity<glm::mat4>();
 
-	glUniformMatrix4fv( ul( "world" ),    1, GL_FALSE, glm::value_ptr( matWorld ) );
-	glUniformMatrix4fv( ul( "worldIT" ),  1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );
+/*	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv( ul( "worldIT" ),  1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );*/
 
 	glUniformMatrix4fv( ul( "viewProj" ), 1, GL_FALSE, glm::value_ptr( m_camera.GetViewProj() ) );
 
@@ -285,9 +351,9 @@ void CMyApp::Render()
 
 
 	// - textúraegységek beállítása
-	glUniform1i( ul( "texImage" ), 0 );
+	/*glUniform1i(ul("texImage"), 0);
 
-	glDrawElements( GL_TRIANGLES,    
+	glDrawElements(GL_TRIANGLES,
 					m_SuzanneGPU.count,			 
 					GL_UNSIGNED_INT,
 					nullptr );
@@ -304,10 +370,21 @@ void CMyApp::Render()
 	glUniformMatrix4fv( ul( "world" ),    1, GL_FALSE, glm::value_ptr( matWorld ) );
 	glUniformMatrix4fv( ul( "worldIT" ),  1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );
 
-	glDrawElements( GL_TRIANGLES,    
+	glDrawElements(GL_TRIANGLES,
 					m_surfaceGPU.count,
 					GL_UNSIGNED_INT,
-					nullptr );
+					nullptr );*/
+
+
+	// Nap
+	// középpont: (0.0,0.0,0.0); sugár: 1.0; forgástengely: 7.25 deg
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_sunTextureID);
+
+	matWorld = glm::rotate<float>(glm::radians(-7.25f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::identity<glm::mat4>();
+	RenderPlanet(matWorld);
 
 	//
 	// skybox

@@ -25,9 +25,7 @@ void main()
 {
 	// A fragment normálvektora
 	// MINDIG normalizáljuk!
-	vec3 normal = normalize( vs_out_norm );
-	
-	
+	vec3 normal = normalize( vs_out_norm );	
 
 	// normal vector debug:
 	// fs_out_col = vec4( normal * 0.5 + 0.5, 1.0 );

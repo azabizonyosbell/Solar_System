@@ -96,6 +96,7 @@ protected:
 	OGLObject m_SuzanneGPU = {};
 	OGLObject m_surfaceGPU = {};
 	OGLObject m_SkyboxGPU = {};
+	OGLObject m_planetGPU = {};
 
 	// Geometria inicializálása, és törtlése
 	void InitGeometry();
@@ -103,11 +104,15 @@ protected:
 	void InitSkyboxGeometry();
 	void CleanSkyboxGeometry();
 
+	void RenderPlanet(glm::mat4 matWorld);
+
 	// Textúrázás, és változói
 
 	GLuint m_SuzanneTextureID = 0;
 	GLuint m_surfaceTextureID = 0;
 	GLuint m_skyboxTextureID = 0;
+
+	GLuint m_sunTextureID = 0;
 
 	void InitTextures();
 	void CleanTextures();
