@@ -181,12 +181,12 @@ void CMyApp::InitSkyboxTextures()
 	// skybox texture
 
 	glGenTextures( 1, &m_skyboxTextureID );
-	TextureFromFile( m_skyboxTextureID, "Assets/xpos.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_POSITIVE_X );
-	TextureFromFile( m_skyboxTextureID, "Assets/xneg.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_NEGATIVE_X );
-	TextureFromFile( m_skyboxTextureID, "Assets/ypos.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_POSITIVE_Y );
-	TextureFromFile( m_skyboxTextureID, "Assets/yneg.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y );
-	TextureFromFile( m_skyboxTextureID, "Assets/zpos.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_POSITIVE_Z );
-	TextureFromFile( m_skyboxTextureID, "Assets/zneg.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z );
+	TextureFromFile(m_skyboxTextureID, "Assets/space_xpos.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	TextureFromFile(m_skyboxTextureID, "Assets/space_xneg.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
+	TextureFromFile(m_skyboxTextureID, "Assets/space_ypos.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
+	TextureFromFile(m_skyboxTextureID, "Assets/space_yneg.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+	TextureFromFile(m_skyboxTextureID, "Assets/space_zpos.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+	TextureFromFile(m_skyboxTextureID, "Assets/space_zneg.png", GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
 	SetupTextureSampling( GL_TEXTURE_CUBE_MAP, m_skyboxTextureID, false );
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
