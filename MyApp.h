@@ -103,7 +103,7 @@ protected:
 	void InitSkyboxGeometry();
 	void CleanSkyboxGeometry();
 
-	void RenderPlanet(glm::mat4 matWorld);
+	void RenderPlanet(glm::mat4 matWorld, GLuint TextureID);
 
 	// Textúrázás, és változói
 
@@ -112,6 +112,16 @@ protected:
 	GLuint m_skyboxTextureID = 0;
 
 	GLuint m_sunTextureID = 0;
+	GLuint m_mercuryTextureID = 0;
+	GLuint m_venusTextureID = 0;
+	GLuint m_earthTextureID = 0;
+	GLuint m_moonTextureID = 0;
+	GLuint m_marsTextureID = 0;
+	GLuint m_jupiterTextureID = 0;
+	GLuint m_saturnTextureID = 0;
+	GLuint m_uranusTextureID = 0;
+	GLuint m_neptuneTextureID = 0;
+	GLuint m_plutoTextureID = 0;
 
 	void InitTextures();
 	void CleanTextures();

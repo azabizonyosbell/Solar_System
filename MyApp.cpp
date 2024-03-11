@@ -143,7 +143,9 @@ void CMyApp::InitSkyboxGeometry()
 	m_SkyboxGPU = CreateGLObjectFromMesh( skyboxCPU, { { 0, offsetof( glm::vec3,x ), 3, GL_FLOAT } } );
 }
 
-void CMyApp::RenderPlanet(glm::mat4 matWorld) {
+void CMyApp::RenderPlanet(glm:: mat4 matWorld, GLuint TextureID) {
+
+	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	glBindVertexArray(m_surfaceGPU.vaoID);
 
@@ -154,6 +156,9 @@ void CMyApp::RenderPlanet(glm::mat4 matWorld) {
 		m_surfaceGPU.count,
 		GL_UNSIGNED_INT,
 		nullptr);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 }
 
 void CMyApp::CleanSkyboxGeometry()
@@ -182,6 +187,56 @@ void CMyApp::InitTextures()
 	glGenTextures(1, &m_sunTextureID);
 	TextureFromFile(m_sunTextureID, "Assets/sun.jpg");
 	SetupTextureSampling(GL_TEXTURE_2D, m_sunTextureID);
+
+	//mercury.jpg – Merkúr textúrája
+	glGenTextures(1, &m_mercuryTextureID);
+	TextureFromFile(m_mercuryTextureID, "Assets/mercury.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_mercuryTextureID);
+
+	//venus.jpg – Vénusz textúrája
+	glGenTextures(1, &m_venusTextureID);
+	TextureFromFile(m_venusTextureID, "Assets/venus.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_venusTextureID);
+
+	//earth.png – A Föld nappali oldalának textúrája
+	glGenTextures(1, &m_earthTextureID);
+	TextureFromFile(m_earthTextureID, "Assets/earth.png");
+	SetupTextureSampling(GL_TEXTURE_2D, m_earthTextureID);
+
+	//moon.jpg – Hold textúrája
+	glGenTextures(1, &m_moonTextureID);
+	TextureFromFile(m_moonTextureID, "Assets/moon.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_moonTextureID);
+
+	//mars.jpg – Mars textúrája
+	glGenTextures(1, &m_marsTextureID);
+	TextureFromFile(m_marsTextureID, "Assets/mars.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_marsTextureID);
+
+	//jupiter.jpg – Jupiter textúrája
+	glGenTextures(1, &m_jupiterTextureID);
+	TextureFromFile(m_jupiterTextureID, "Assets/jupiter.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_jupiterTextureID);
+
+	//saturn.jpg – Szaturnusz textúrája
+	glGenTextures(1, &m_saturnTextureID);
+	TextureFromFile(m_saturnTextureID, "Assets/saturn.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_saturnTextureID);
+
+	//uranus.jpg – Uránusz textúrája
+	glGenTextures(1, &m_uranusTextureID);
+	TextureFromFile(m_uranusTextureID, "Assets/uranus.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_uranusTextureID);
+
+	//neptune.jpg – Neptunusz textúrája
+	glGenTextures(1, &m_neptuneTextureID);
+	TextureFromFile(m_neptuneTextureID, "Assets/neptune.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_neptuneTextureID);
+
+	//pluto.jpg – Pluto textúrája
+	glGenTextures(1, &m_plutoTextureID);
+	TextureFromFile(m_plutoTextureID, "Assets/pluto.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_plutoTextureID);
 }
 
 void CMyApp::CleanTextures()
@@ -191,6 +246,16 @@ void CMyApp::CleanTextures()
 //	glDeleteTextures( 1, &m_SuzanneTextureID );
 //	glDeleteTextures( 1, &m_surfaceTextureID );
 	glDeleteTextures(1, &m_sunTextureID);
+	glDeleteTextures(1, &m_mercuryTextureID);
+	glDeleteTextures(1, &m_venusTextureID);
+	glDeleteTextures(1, &m_earthTextureID);
+	glDeleteTextures(1, &m_moonTextureID);
+	glDeleteTextures(1, &m_marsTextureID);
+	glDeleteTextures(1, &m_jupiterTextureID);
+	glDeleteTextures(1, &m_saturnTextureID);
+	glDeleteTextures(1, &m_uranusTextureID);
+	glDeleteTextures(1, &m_neptuneTextureID);
+	glDeleteTextures(1, &m_plutoTextureID);
 
 	// skybox texture
 
@@ -332,15 +397,116 @@ void CMyApp::Render()
 
 
 	// Nap
-	// középpont: (0.0,0.0,0.0); sugár: 1.0; forgástengely: 7.25 deg
+	// középpont: (0.0, 0.0, 0.0); sugár: 1.0;
+	// forgástengely: 7.25 deg
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_sunTextureID);
 
 	matWorld = glm::rotate<float>(glm::radians(-7.25f), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::identity<glm::mat4>();
-	RenderPlanet(matWorld);
+	RenderPlanet(matWorld, m_sunTextureID);
 
+	// Merkúr
+	// Felszíne legyen 1 egységre a Nap felszínétől; surgár: 0.15;
+	// középpont: (2.15, 0.0, 0.0)  (1 + 1 + 0.15 = 2.15)
+	// forgástengely: 0.01 deg
+	
+	matWorld = glm::translate<float>(glm::vec3(2.15f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-0.01f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.15f, 0.15f, 0.15f));
+	RenderPlanet(matWorld, m_mercuryTextureID);
+
+	// Vénusz
+	// Felszíne legyen 2 egységre a Nap felszínétől; surgár:  0.13;
+	// 2 + 1 + 0.13 = 3.13
+	// forgástengely: 177.4 deg
+
+	matWorld = glm::translate<float>(glm::vec3(3.13f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-177.4f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.13f, 0.13f, 0.13f));
+	RenderPlanet(matWorld, m_venusTextureID);
+
+	// Föld
+	// Felszíne legyen 3 egységre a Nap felszínétől; surgár: 0.2;
+	// 3 + 1 + 0.2 = 4.2
+	// forgástengely: 23.44 fok
+
+	matWorld = glm::translate<float>(glm::vec3(4.2f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-23.44f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.2f, 0.2f, 0.2f));
+	RenderPlanet(matWorld, m_earthTextureID);
+
+	// Hold
+	// Felszíne legyen 0.2 egységre a Fökld felszínétől; surgár: Föld méretének 1 / 3 része
+	// 4.2 + 0.2 + 0.2 + 0.06667 = 4.66667
+	// forgástengely: 1.54
+
+	matWorld = glm::translate<float>(glm::vec3(4.6667f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-1.54f), glm::vec3(0.0f, 0.0f, 1.0f))  // megnézni, hogy miért különleges
+		* glm::scale<float>(glm::vec3(0.06667f, 0.06667f, 0.06667f));
+	RenderPlanet(matWorld, m_moonTextureID);
+
+	// Mars
+	// Felszíne legyen 4 egységre a Nap felszínétől; surgár: 0.19;
+	// 4 + 1 + 0.19 = 5.19
+	// forgástengely: 25.19 fok
+
+	matWorld = glm::translate<float>(glm::vec3(5.19f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-25.19f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.19f, 0.19f, 0.19f));
+	RenderPlanet(matWorld, m_marsTextureID);
+
+	// Jupiter
+	// Felszíne legyen 5 egységre a Nap felszínétől; surgár: 0.4;
+	//  5 + 1 + 0.4 = 6.4
+	// forgástengely: 3.13 fok
+
+	matWorld = glm::translate<float>(glm::vec3(6.4f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-3.13f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.4f, 0.4f, 0.4f));
+	RenderPlanet(matWorld, m_jupiterTextureID);
+
+	// Szaturnusz
+	// Felszíne legyen 6 egységre a Nap felszínétől; surgár: 0.35;
+	// 6 + 1 + 0.35 = 7.35
+	// forgástengely: 26.73 fok
+
+	matWorld = glm::translate<float>(glm::vec3(7.35f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-26.73f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.35f, 0.35f, 0.35f));
+	RenderPlanet(matWorld, m_saturnTextureID);
+
+	// Uránusz
+	// Felszíne legyen 7 egységre a Nap felszínétől; surgár: 0.25;
+	// 7 + 1 + 0.25 = 8.25
+	// forgástengely: 97.77 fok
+
+	matWorld = glm::translate<float>(glm::vec3(8.25f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-97.77f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.25f, 0.25f, 0.25f));
+	RenderPlanet(matWorld, m_uranusTextureID);
+
+	// Neptunusz
+	// Felszíne legyen 8 egységre a Nap felszínétől; surgár: 0.26;
+	// 8 + 1 + 0.26 = 9.26
+	// forgástengely: 28.32 fok
+
+	matWorld = glm::translate<float>(glm::vec3(9.26f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-28.32f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.26f, 0.26f, 0.26f));
+	RenderPlanet(matWorld, m_neptuneTextureID);
+
+	// Pluto
+	// Felszíne legyen 9 egységre a Nap felszínétől; surgár: 0.1;
+	// 9 + 1 + 0.1 = 10.1
+	// forgástengely: 119.61 fok
+
+	matWorld = glm::translate<float>(glm::vec3(10.1f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-119.61f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.10f, 0.10f, 0.10f));
+	RenderPlanet(matWorld, m_plutoTextureID);
+	
+	
 	//
 	// skybox
 	//
