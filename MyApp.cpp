@@ -67,47 +67,6 @@ struct Param
 	}
 };
 
-struct Sphere
-{
-	glm::vec3 GetPos(float u, float v) const noexcept
-	{
-
-		float a = u * 2 * M_PI;
-		float b = v * M_PI;
-
-		float r = 1;
-
-		float x = r * cos(a) * sin(b);
-		float y = r * sin(a) * sin(b);
-		float z = r * cos(b);
-
-		return glm::vec3(x, z, y);
-
-	}
-	glm::vec3 GetNorm(float u, float v) const noexcept
-	{
-		glm::vec3 p = GetPos(u, v);
-
-		float e = 0.01;
-
-		glm::vec3 u1 = GetPos(glm::clamp(u - e, 0.f, 1.f), v);
-		glm::vec3 u2 = GetPos(glm::clamp(u + e, 0.f, 1.f), v);
-
-		glm::vec3 t1 = u2 - u1;
-
-		glm::vec3 v1 = GetPos(u, glm::clamp(v - e, 0.f, 1.f));
-		glm::vec3 v2 = GetPos(u, glm::clamp(v + e, 0.f, 1.f));
-
-		glm::vec3 t2 = v2 - v1;
-
-		return normalize(glm::cross(t1, t2));
-	}
-	glm::vec2 GetTex(float u, float v) const noexcept
-	{
-		return glm::vec2(u, v);
-	}
-};
-
 void CMyApp::InitGeometry()
 {
 
@@ -123,13 +82,10 @@ void CMyApp::InitGeometry()
 	/*MeshObject<Vertex> suzanneMeshCPU = ObjParser::parse("Assets/Suzanne.obj");
 	m_SuzanneGPU = CreateGLObjectFromMesh( suzanneMeshCPU, vertexAttribList );*/
 
-	// Parametrikus felület
-	/*MeshObject<Vertex> surfaceMeshCPU = GetParamSurfMesh(Param());
-	m_surfaceGPU = CreateGLObjectFromMesh( surfaceMeshCPU, vertexAttribList );*/
-
-	// Bolygó (gömb)
-	MeshObject<Vertex> planetMeshCPU = GetParamSurfMesh(Sphere());
-	m_planetGPU = CreateGLObjectFromMesh(planetMeshCPU, vertexAttribList);
+	// Ez egy sík, a gömb objektum koordinátáit, normál vektorait
+	// és textúra koordinátáit a vertex-shaderben számoljuk 
+	MeshObject<Vertex> surfaceMeshCPU = GetParamSurfMesh(Param());
+	m_surfaceGPU = CreateGLObjectFromMesh(surfaceMeshCPU, vertexAttribList);
 
 	// Skybox
 	InitSkyboxGeometry();
@@ -138,8 +94,7 @@ void CMyApp::InitGeometry()
 void CMyApp::CleanGeometry()
 {
 //	CleanOGLObject( m_SuzanneGPU );
-//	CleanOGLObject( m_surfaceGPU );
-	CleanOGLObject( m_planetGPU );
+	CleanOGLObject( m_surfaceGPU );
 	CleanSkyboxGeometry();
 }
 
@@ -190,13 +145,13 @@ void CMyApp::InitSkyboxGeometry()
 
 void CMyApp::RenderPlanet(glm::mat4 matWorld) {
 
-	glBindVertexArray(m_planetGPU.vaoID);
+	glBindVertexArray(m_surfaceGPU.vaoID);
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
 
 	glDrawElements(GL_TRIANGLES,
-		m_planetGPU.count,
+		m_surfaceGPU.count,
 		GL_UNSIGNED_INT,
 		nullptr);
 }

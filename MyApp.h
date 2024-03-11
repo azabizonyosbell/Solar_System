@@ -96,7 +96,6 @@ protected:
 	OGLObject m_SuzanneGPU = {};
 	OGLObject m_surfaceGPU = {};
 	OGLObject m_SkyboxGPU = {};
-	OGLObject m_planetGPU = {};
 
 	// Geometria inicializálása, és törtlése
 	void InitGeometry();
