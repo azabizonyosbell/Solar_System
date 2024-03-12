@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="15.0">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -88,7 +88,7 @@
     <ClCompile Include="includes\GLUtils.cpp" />
     <ClCompile Include="includes\Camera.cpp" />
     <ClCompile Include="includes\ObjParser.cpp" />
-    </ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="includes\SDL_GLDebugMessageCallback.h" />
@@ -96,17 +96,19 @@
     <ClInclude Include="includes\Camera.h" />
     <ClInclude Include="includes\ObjParser.h" />
     <ClInclude Include="includes\ParametricSurfaceMesh.hpp" />
-    </ItemGroup>
+  </ItemGroup>
   <ItemGroup>
+    <None Include="Frag_Belt.frag" />
+    <None Include="Vert_Belt.vert" />
     <None Include="Vert_PosNormTex.vert" />
     <None Include="Frag_skybox.frag" />
     <None Include="Frag_ZH.frag" />
     <None Include="Vert_skybox.vert" />
-    </ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Suzanne.obj" />
     <Text Include="Assets\asteroid.obj" />
-    </ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\wood.jpg" />
     <Image Include="Assets\zpos.png" />
@@ -138,7 +140,7 @@
     <Image Include="Assets\uranus.jpg" />
     <Image Include="Assets\uranus-ring.png" />
     <Image Include="Assets\venus.jpg" />
-    </ItemGroup>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

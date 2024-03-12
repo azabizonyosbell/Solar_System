@@ -31,6 +31,8 @@ void CMyApp::InitShaders()
 	m_programID = glCreateProgram();
 	AssembleProgram( m_programID, "Vert_PosNormTex.vert", "Frag_ZH.frag" );
 	InitSkyboxShaders();
+	m_beltProgramID = glCreateProgram();
+	AssembleProgram(m_beltProgramID, "Vert_Belt.vert", "Frag_Belt.frag");
 }
 
 void CMyApp::InitSkyboxShaders()
@@ -43,6 +45,7 @@ void CMyApp::CleanShaders()
 {
 	glDeleteProgram( m_programID );
 	CleanSkyboxShaders();
+	glDeleteProgram(m_beltProgramID);
 }
 
 void CMyApp::CleanSkyboxShaders()
@@ -89,6 +92,25 @@ void CMyApp::InitGeometry()
 
 	// Skybox
 	InitSkyboxGeometry();
+
+	// övek
+	MeshObject<Vertex> beltMeshCPU;
+
+	std::vector<Vertex>vertices;
+								 
+	vertices.push_back({ glm::vec3(-0.5,  0.0, -0.5), glm::vec3(0.0, +1.0, 0.0), glm::vec2(0, 0) });
+	vertices.push_back({ glm::vec3(-0.5,  0.0, +0.5), glm::vec3(0.0, +1.0, 0.0), glm::vec2(1, 0) });
+	vertices.push_back({ glm::vec3(+0.5,  0.0, -0.5), glm::vec3(0.0, +1.0, 0.0), glm::vec2(0, 1) });
+	vertices.push_back({ glm::vec3(+0.5,  0.0, +0.5), glm::vec3(0.0, +1.0, 0.0), glm::vec2(1, 1) });
+
+	beltMeshCPU.indexArray =
+	{
+		0, 1, 2,
+		1, 3, 2
+	};
+
+	beltMeshCPU.vertexArray = vertices;
+	m_beltGPU = CreateGLObjectFromMesh(beltMeshCPU, vertexAttribList);
 }
 
 void CMyApp::CleanGeometry()
@@ -237,6 +259,26 @@ void CMyApp::InitTextures()
 	glGenTextures(1, &m_plutoTextureID);
 	TextureFromFile(m_plutoTextureID, "Assets/pluto.jpg");
 	SetupTextureSampling(GL_TEXTURE_2D, m_plutoTextureID);
+
+	//kuiper.png - Kuiper-öv textúrája
+	glGenTextures(1, &m_kuiperTextureID);
+	TextureFromFile(m_kuiperTextureID, "Assets/kuiper.png");
+	SetupTextureSampling(GL_TEXTURE_2D, m_kuiperTextureID);
+
+	//saturn-ring.png - Szaturnusz-öv textúrája
+	glGenTextures(1, &m_saturn_ringTextureID);
+	TextureFromFile(m_saturn_ringTextureID, "Assets/saturn-ring.png");
+	SetupTextureSampling(GL_TEXTURE_2D, m_saturn_ringTextureID);
+
+	//uranus-ring.png - Uránusz-öv textúrája
+	glGenTextures(1, &m_uranus_ringTextureID);
+	TextureFromFile(m_uranus_ringTextureID, "Assets/uranus-ring.png");
+	SetupTextureSampling(GL_TEXTURE_2D, m_uranus_ringTextureID);
+
+	//neptune-ring.pngg - Neptunusz-öv textúrája
+	glGenTextures(1, &m_neptune_ringTextureID);
+	TextureFromFile(m_neptune_ringTextureID, "Assets/neptune-ring.png");
+	SetupTextureSampling(GL_TEXTURE_2D, m_neptune_ringTextureID);
 }
 
 void CMyApp::CleanTextures()
@@ -256,6 +298,11 @@ void CMyApp::CleanTextures()
 	glDeleteTextures(1, &m_uranusTextureID);
 	glDeleteTextures(1, &m_neptuneTextureID);
 	glDeleteTextures(1, &m_plutoTextureID);
+
+	glDeleteTextures(1, &m_kuiperTextureID);
+	glDeleteTextures(1, &m_saturn_ringTextureID);
+	glDeleteTextures(1, &m_uranus_ringTextureID);
+	glDeleteTextures(1, &m_neptune_ringTextureID);
 
 	// skybox texture
 
@@ -305,7 +352,7 @@ bool CMyApp::Init()
 
 	// kamera
 	m_camera.SetView(
-		glm::vec3(0.0, 7.0, 7.0),// honnan nézzük a színteret	   - eye
+		glm::vec3(0.0, 5.0, 35.0),// honnan nézzük a színteret	   - eye
 		glm::vec3(0.0, 0.0, 0.0),   // a színtér melyik pontját nézzük - at
 		glm::vec3(0.0, 1.0, 0.0));  // felfelé mutató irány a világban - up
 
@@ -341,6 +388,10 @@ void CMyApp::Render()
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_SuzanneTextureID );*/
 
+	//
+	// égitestek
+	//
+	
 	glUseProgram( m_programID );
 
 	glm::mat4 matWorld = glm::identity<glm::mat4>();
@@ -539,6 +590,118 @@ void CMyApp::Render()
 	glDrawElements( GL_TRIANGLES, m_SkyboxGPU.count, GL_UNSIGNED_INT, nullptr );
 
 	glDepthFunc(prevDepthFnc);
+
+
+	//
+	// gyűrűk
+	//
+
+	glUseProgram(m_beltProgramID);
+
+	matWorld = glm::identity<glm::mat4>();
+
+	/*	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+		glUniformMatrix4fv( ul( "worldIT" ),  1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );*/
+
+	glUniformMatrix4fv(ul("viewProj"), 1, GL_FALSE, glm::value_ptr(m_camera.GetViewProj()));
+
+	// - Fényforrások beállítása
+	glUniform3fv(ul("cameraPos"), 1, glm::value_ptr(m_camera.GetEye()));
+	glUniform4fv(ul("lightPos"), 1, glm::value_ptr(m_lightPos));
+
+	glUniform3fv(ul("La"), 1, glm::value_ptr(m_La));
+	glUniform3fv(ul("Ld"), 1, glm::value_ptr(m_Ld));
+	glUniform3fv(ul("Ls"), 1, glm::value_ptr(m_Ls));
+
+	glUniform1f(ul("lightConstantAttenuation"), m_lightConstantAttenuation);
+	glUniform1f(ul("lightLinearAttenuation"), m_lightLinearAttenuation);
+	glUniform1f(ul("lightQuadraticAttenuation"), m_lightQuadraticAttenuation);
+
+	// - Anyagjellemzők beállítása
+	glUniform3fv(ul("Ka"), 1, glm::value_ptr(m_Ka));
+	glUniform3fv(ul("Kd"), 1, glm::value_ptr(m_Kd));
+	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
+
+	glUniform1f(ul("Shininess"), m_Shininess);
+
+	glBindVertexArray(m_beltGPU.vaoID);
+
+	glEnable(GL_BLEND);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+
+	glDisable(GL_CULL_FACE);
+	
+	// Szaturnusz-öv
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_saturn_ringTextureID);
+
+	// Szarturnusz pozíciója: 
+	matWorld = glm::translate<float>(glm::vec3(7.35f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-26.73f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(1.5f, 1.0f, 1.5f)) * glm::identity<glm::mat4>();
+
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glDrawElements(GL_TRIANGLES,
+		m_beltGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
+
+	// Uránusz-öv
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_uranus_ringTextureID);
+
+	// Uránusz pozíciója: 
+	matWorld = glm::translate<float>(glm::vec3(8.25f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-97.77f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale<float>(glm::vec3(0.85f, 1.0f, 0.85f)) * glm::identity<glm::mat4>();
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glDrawElements(GL_TRIANGLES,
+		m_beltGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
+
+	// Neptunusz-öv
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_neptune_ringTextureID);
+
+	// Neptunusz pozíciója: 
+	matWorld = glm::translate<float>(glm::vec3(9.26f, 0.0f, 0.0f))
+		* glm::rotate<float>(glm::radians(-28.32f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::identity<glm::mat4>();
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glDrawElements(GL_TRIANGLES,
+		m_beltGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
+
+	// Kuiper-öv
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_kuiperTextureID);
+
+	matWorld = glm::translate<float>(glm::vec3(0.0f, -0.05f, 0.0f))
+		* glm::scale<float>(glm::vec3(25.0f, 1.0f, 25.0f))
+		* glm::identity<glm::mat4>();
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glDrawElements(GL_TRIANGLES,
+		m_beltGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
+
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
 
 	// shader kikapcsolasa
 	glUseProgram( 0 );

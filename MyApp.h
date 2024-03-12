@@ -65,6 +65,7 @@ protected:
 	// shaderekhez szükséges változók
 	GLuint m_programID = 0;		  // shaderek programja
 	GLuint m_programSkyboxID = 0; // skybox programja
+	GLuint m_beltProgramID = 0;	  // övek programja
 
 
 	// Fényforrás- ...
@@ -96,6 +97,7 @@ protected:
 	OGLObject m_SuzanneGPU = {};
 	OGLObject m_surfaceGPU = {};
 	OGLObject m_SkyboxGPU = {};
+	OGLObject m_beltGPU = {};
 
 	// Geometria inicializálása, és törtlése
 	void InitGeometry();
@@ -122,6 +124,11 @@ protected:
 	GLuint m_uranusTextureID = 0;
 	GLuint m_neptuneTextureID = 0;
 	GLuint m_plutoTextureID = 0;
+
+	GLuint m_kuiperTextureID = 0;
+	GLuint m_saturn_ringTextureID = 0;
+	GLuint m_uranus_ringTextureID = 0;
+	GLuint m_neptune_ringTextureID = 0;
 
 	void InitTextures();
 	void CleanTextures();
