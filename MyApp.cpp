@@ -70,6 +70,34 @@ struct Param
 	}
 };
 
+class Orb
+{	
+public:
+	Orb(float const& distance, float const& radius, float const& axisAngle,
+		float const& periodTimeAroundSun,  float const& periodTimeOwn)
+		: distance(distance), radius(radius), axisAngle(axisAngle),
+		periodTimeAroundSun(periodTimeAroundSun), periodTimeOwn(periodTimeOwn)
+	{}
+
+	glm::mat4 GenTransformMatrix(float m_ElapsedTimeInSec) {
+
+		glm::mat4 matWorld = glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / periodTimeAroundSun)), glm::vec3(0.0, 1.0, 0.0))
+			* glm::translate<float>(glm::vec3(distance, 0.0f, 0.0f))
+			* glm::rotate<float>(glm::radians(-1 * axisAngle), glm::vec3(0.0f, 0.0f, 1.0f))
+			* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / periodTimeOwn)), glm::vec3(0.0, 1.0, 0.0))
+			* glm::scale<float>(glm::vec3(radius, radius, radius)) * glm::identity<glm::mat4>();
+
+		return matWorld;
+	}
+
+private:
+	float distance;
+	float radius;
+	float axisAngle;
+	float periodTimeAroundSun;
+	float periodTimeOwn;
+};
+
 void CMyApp::InitGeometry()
 {
 
@@ -432,30 +460,25 @@ void CMyApp::Render()
 	// Felszíne legyen 1 egységre a Nap felszínétől; surgár: 0.15;
 	// középpont: (2.15, 0.0, 0.0)  (1 + 1 + 0.15 = 2.15)
 	// forgástengely: 0.01 deg
-	
-	matWorld = glm::translate<float>(glm::vec3(2.15f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-0.01f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.15f, 0.15f, 0.15f));
+	Orb mercury(2.15f, 0.15f, 0.01f, 89.f, 58.7f);	
+	matWorld = mercury.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_mercuryTextureID);
 
 	// Vénusz
 	// Felszíne legyen 2 egységre a Nap felszínétől; surgár:  0.13;
 	// 2 + 1 + 0.13 = 3.13
 	// forgástengely: 177.4 deg
-
-	matWorld = glm::translate<float>(glm::vec3(3.13f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-177.4f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.13f, 0.13f, 0.13f));
+	Orb venus(3.13f, 0.13f, 177.4f, 243.f, 255.f);
+	matWorld = venus.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_venusTextureID);
 
 	// Föld
 	// Felszíne legyen 3 egységre a Nap felszínétől; surgár: 0.2;
 	// 3 + 1 + 0.2 = 4.2
 	// forgástengely: 23.44 fok
-
-	matWorld = glm::translate<float>(glm::vec3(4.2f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-23.44f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.2f, 0.2f, 0.2f));
+	// Orb(distance, radius, axisAngle, periodTimeAroundSun, periodTimeOwn)
+	Orb earth(4.2f, 0.2f, 23.44f, 365.f, 1.f);
+	matWorld = earth.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_earthTextureID);
 
 	// Hold
@@ -593,6 +616,7 @@ void CMyApp::Render()
 	glUniform3fv(ul("Kd"), 1, glm::value_ptr(m_Kd));
 	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
 
+	glUniform1f(ul("Shininess"), m_Shininess);
 	glUniform1f(ul("Shininess"), m_Shininess);
 
 	// aszteroida

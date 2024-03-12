@@ -43,6 +43,7 @@ public:
 	void MouseUp(const SDL_MouseButtonEvent&);
 	void MouseWheel(const SDL_MouseWheelEvent&);
 	void Resize(int, int);
+
 protected:
 	void SetupDebugCallback();
 
