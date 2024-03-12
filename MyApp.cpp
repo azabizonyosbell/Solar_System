@@ -80,15 +80,15 @@ void CMyApp::InitGeometry()
 		{ 2, offsetof( Vertex, texcoord ), 2, GL_FLOAT },
 	};
 
-	// Suzanne
-
-	/*MeshObject<Vertex> suzanneMeshCPU = ObjParser::parse("Assets/Suzanne.obj");
-	m_SuzanneGPU = CreateGLObjectFromMesh( suzanneMeshCPU, vertexAttribList );*/
-
 	// Ez egy sík, a gömb objektum koordinátáit, normál vektorait
 	// és textúra koordinátáit a vertex-shaderben számoljuk 
 	MeshObject<Vertex> surfaceMeshCPU = GetParamSurfMesh(Param());
 	m_surfaceGPU = CreateGLObjectFromMesh(surfaceMeshCPU, vertexAttribList);
+
+	// aszteroida
+
+	MeshObject<Vertex> asteroidMeshCPU = ObjParser::parse("Assets/asteroid.obj");
+	m_asteroidGPU = CreateGLObjectFromMesh(asteroidMeshCPU, vertexAttribList);
 
 	// Skybox
 	InitSkyboxGeometry();
@@ -115,8 +115,9 @@ void CMyApp::InitGeometry()
 
 void CMyApp::CleanGeometry()
 {
-//	CleanOGLObject( m_SuzanneGPU );
 	CleanOGLObject( m_surfaceGPU );
+	CleanOGLObject( m_asteroidGPU );
+	CleanOGLObject( m_beltGPU );
 	CleanSkyboxGeometry();
 }
 
@@ -279,14 +280,17 @@ void CMyApp::InitTextures()
 	glGenTextures(1, &m_neptune_ringTextureID);
 	TextureFromFile(m_neptune_ringTextureID, "Assets/neptune-ring.png");
 	SetupTextureSampling(GL_TEXTURE_2D, m_neptune_ringTextureID);
+
+	//rock.jpg - aszteroida textúrája
+	glGenTextures(1, &m_asteroidTextureID);
+	TextureFromFile(m_asteroidTextureID, "Assets/rock.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_asteroidTextureID);
 }
 
 void CMyApp::CleanTextures()
 {
 	// diffuse textures
 
-//	glDeleteTextures( 1, &m_SuzanneTextureID );
-//	glDeleteTextures( 1, &m_surfaceTextureID );
 	glDeleteTextures(1, &m_sunTextureID);
 	glDeleteTextures(1, &m_mercuryTextureID);
 	glDeleteTextures(1, &m_venusTextureID);
@@ -303,6 +307,8 @@ void CMyApp::CleanTextures()
 	glDeleteTextures(1, &m_saturn_ringTextureID);
 	glDeleteTextures(1, &m_uranus_ringTextureID);
 	glDeleteTextures(1, &m_neptune_ringTextureID);
+
+	glDeleteTextures(1, &m_asteroidTextureID);
 
 	// skybox texture
 
@@ -380,14 +386,6 @@ void CMyApp::Render()
 	// ... és a mélységi Z puffert (GL_DEPTH_BUFFER_BIT)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Suzanne
-
-	/*glBindVertexArray(m_SuzanneGPU.vaoID);
-
-	// - Textúrák beállítása, minden egységre külön
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, m_SuzanneTextureID );*/
-
 	//
 	// égitestek
 	//
@@ -419,33 +417,6 @@ void CMyApp::Render()
 	glUniform3fv( ul( "Ks" ),		 1, glm::value_ptr( m_Ks ) );
 
 	glUniform1f( ul( "Shininess" ),	m_Shininess );
-
-
-	// - textúraegységek beállítása
-	/*glUniform1i(ul("texImage"), 0);
-
-	glDrawElements(GL_TRIANGLES,
-					m_SuzanneGPU.count,			 
-					GL_UNSIGNED_INT,
-					nullptr );
-
-	// Parametrikus felület
-
-	glBindVertexArray( m_surfaceGPU.vaoID );
-
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, m_surfaceTextureID );
-
-	matWorld = glm::translate( glm::vec3(2.0f,0.0f,0.0f));
-
-	glUniformMatrix4fv( ul( "world" ),    1, GL_FALSE, glm::value_ptr( matWorld ) );
-	glUniformMatrix4fv( ul( "worldIT" ),  1, GL_FALSE, glm::value_ptr( glm::transpose( glm::inverse( matWorld ) ) ) );
-
-	glDrawElements(GL_TRIANGLES,
-					m_surfaceGPU.count,
-					GL_UNSIGNED_INT,
-					nullptr );*/
-
 
 	// Nap
 	// középpont: (0.0, 0.0, 0.0); sugár: 1.0;
@@ -623,6 +594,24 @@ void CMyApp::Render()
 	glUniform3fv(ul("Ks"), 1, glm::value_ptr(m_Ks));
 
 	glUniform1f(ul("Shininess"), m_Shininess);
+
+	// aszteroida
+	glBindVertexArray(m_asteroidGPU.vaoID);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_asteroidTextureID);
+
+	matWorld = glm::translate<float>(glm::vec3(4.5f, 0.0f, 0.0f))
+		* glm::scale<float>(glm::vec3(0.05f, 0.05f, 0.05f))
+		* glm::identity<glm::mat4>();
+
+	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
+	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
+
+	glDrawElements(GL_TRIANGLES,
+		m_asteroidGPU.count,
+		GL_UNSIGNED_INT,
+		nullptr);
 
 	glBindVertexArray(m_beltGPU.vaoID);
 

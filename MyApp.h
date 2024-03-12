@@ -94,10 +94,10 @@ protected:
 
 	// Geometriával kapcsolatos változók
 
-	OGLObject m_SuzanneGPU = {};
 	OGLObject m_surfaceGPU = {};
-	OGLObject m_SkyboxGPU = {};
+	OGLObject m_asteroidGPU = {};
 	OGLObject m_beltGPU = {};
+	OGLObject m_SkyboxGPU = {};
 
 	// Geometria inicializálása, és törtlése
 	void InitGeometry();
@@ -129,6 +129,8 @@ protected:
 	GLuint m_saturn_ringTextureID = 0;
 	GLuint m_uranus_ringTextureID = 0;
 	GLuint m_neptune_ringTextureID = 0;
+
+	GLuint m_asteroidTextureID = 0;
 
 	void InitTextures();
 	void CleanTextures();
