@@ -476,7 +476,6 @@ void CMyApp::Render()
 	// Felszíne legyen 3 egységre a Nap felszínétől; surgár: 0.2;
 	// 3 + 1 + 0.2 = 4.2
 	// forgástengely: 23.44 fok
-	// Orb(distance, radius, axisAngle, periodTimeAroundSun, periodTimeOwn)
 	Orb earth(4.2f, 0.2f, 23.44f, 365.f, 1.f);
 	matWorld = earth.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_earthTextureID);
@@ -485,17 +484,20 @@ void CMyApp::Render()
 	// Felszíne legyen 0.2 egységre a Fökld felszínétől; surgár: Föld méretének 1 / 3 része
 	// 4.2 + 0.2 + 0.2 + 0.06667 = 4.66667
 	// forgástengely: 1.54
-
-	matWorld = glm::translate<float>(glm::vec3(4.6667f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-1.54f), glm::vec3(0.0f, 0.0f, 1.0f))  // megnézni, hogy miért különleges
-		* glm::scale<float>(glm::vec3(0.06667f, 0.06667f, 0.06667f));
+	// egy földi év alatt 12-szer kerülje meg a Földet
+	matWorld = glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / 365.f)), glm::vec3(0.0, 1.0, 0.0))
+			* glm::translate<float>(glm::vec3(4.2f, 0.0f, 0.0f))
+			* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / 30.f)), glm::vec3(0.0, 1.0, 0.0))
+			* glm::translate<float>(glm::vec3(0.46667f, 0.0f, 0.0f))
+			* glm::rotate<float>(glm::radians(-1.54f), glm::vec3(0.0f, 0.0f, 1.0f))
+			* glm::scale<float>(glm::vec3(0.06667f, 0.06667f, 0.06667f));
 	RenderPlanet(matWorld, m_moonTextureID);
 
 	// Mars
 	// Felszíne legyen 4 egységre a Nap felszínétől; surgár: 0.19;
 	// 4 + 1 + 0.19 = 5.19
 	// forgástengely: 25.19 fok
-
+	// Orb(distance, radius, axisAngle, periodTimeAroundSun, periodTimeOwn)
 	matWorld = glm::translate<float>(glm::vec3(5.19f, 0.0f, 0.0f))
 		* glm::rotate<float>(glm::radians(-25.19f), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::scale<float>(glm::vec3(0.19f, 0.19f, 0.19f));
