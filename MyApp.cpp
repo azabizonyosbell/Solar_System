@@ -81,10 +81,10 @@ public:
 
 	glm::mat4 GenTransformMatrix(float m_ElapsedTimeInSec) {
 
-		glm::mat4 matWorld = glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / periodTimeAroundSun)), glm::vec3(0.0, 1.0, 0.0))
+		glm::mat4 matWorld = glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (periodTimeAroundSun != 0 ? 360.f / periodTimeAroundSun : 0)), glm::vec3(0.0, 1.0, 0.0))
 			* glm::translate<float>(glm::vec3(distance, 0.0f, 0.0f))
 			* glm::rotate<float>(glm::radians(-1 * axisAngle), glm::vec3(0.0f, 0.0f, 1.0f))
-			* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / periodTimeOwn)), glm::vec3(0.0, 1.0, 0.0))
+			* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (periodTimeOwn != 0 ? 360.f / periodTimeOwn : 0)), glm::vec3(0.0, 1.0, 0.0))
 			* glm::scale<float>(glm::vec3(radius, radius, radius)) * glm::identity<glm::mat4>();
 
 		return matWorld;
@@ -453,6 +453,7 @@ void CMyApp::Render()
 	glActiveTexture(GL_TEXTURE0);
 
 	matWorld = glm::rotate<float>(glm::radians(-7.25f), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / 27.f)), glm::vec3(0.0, 1.0, 0.0))
 		* glm::identity<glm::mat4>();
 	RenderPlanet(matWorld, m_sunTextureID);
 
@@ -497,60 +498,48 @@ void CMyApp::Render()
 	// Felszíne legyen 4 egységre a Nap felszínétől; surgár: 0.19;
 	// 4 + 1 + 0.19 = 5.19
 	// forgástengely: 25.19 fok
-	// Orb(distance, radius, axisAngle, periodTimeAroundSun, periodTimeOwn)
-	matWorld = glm::translate<float>(glm::vec3(5.19f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-25.19f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.19f, 0.19f, 0.19f));
+	Orb mars(5.19f, 0.19f, 25.19f, 687.f, 1.04f);
+	matWorld = mars.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_marsTextureID);
 
 	// Jupiter
 	// Felszíne legyen 5 egységre a Nap felszínétől; surgár: 0.4;
 	//  5 + 1 + 0.4 = 6.4
-	// forgástengely: 3.13 fok
-
-	matWorld = glm::translate<float>(glm::vec3(6.4f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-3.13f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.4f, 0.4f, 0.4f));
+	// forgástengely: 3.13 fok	
+	Orb jupiter(6.4f, 0.4f, 3.13f, 4329.f, 0.42f);
+	matWorld = jupiter.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_jupiterTextureID);
 
 	// Szaturnusz
 	// Felszíne legyen 6 egységre a Nap felszínétől; surgár: 0.35;
 	// 6 + 1 + 0.35 = 7.35
 	// forgástengely: 26.73 fok
-
-	matWorld = glm::translate<float>(glm::vec3(7.35f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-26.73f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.35f, 0.35f, 0.35f));
+	Orb saturn(7.35f, 0.35f, 26.73f, 10753.f, 0.46f);
+	matWorld = saturn.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_saturnTextureID);
 
 	// Uránusz
 	// Felszíne legyen 7 egységre a Nap felszínétől; surgár: 0.25;
 	// 7 + 1 + 0.25 = 8.25
 	// forgástengely: 97.77 fok
-
-	matWorld = glm::translate<float>(glm::vec3(8.25f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-97.77f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.25f, 0.25f, 0.25f));
+	Orb uranus(8.25f, 0.25f, 97.77f, 30664.f, 0.71f);
+	matWorld = uranus.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_uranusTextureID);
 
 	// Neptunusz
 	// Felszíne legyen 8 egységre a Nap felszínétől; surgár: 0.26;
 	// 8 + 1 + 0.26 = 9.26
 	// forgástengely: 28.32 fok
-
-	matWorld = glm::translate<float>(glm::vec3(9.26f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-28.32f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.26f, 0.26f, 0.26f));
+	Orb neptune(9.26f, 0.26f, 28.32f, 60148.f, 0.66f);
+	matWorld = neptune.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_neptuneTextureID);
 
 	// Pluto
 	// Felszíne legyen 9 egységre a Nap felszínétől; surgár: 0.1;
 	// 9 + 1 + 0.1 = 10.1
 	// forgástengely: 119.61 fok
-
-	matWorld = glm::translate<float>(glm::vec3(10.1f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-119.61f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.10f, 0.10f, 0.10f));
+	Orb pluto(10.1f, 0.1f, 119.61f, 90520.f, 6.37f);
+	matWorld = pluto.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_plutoTextureID);
 	
 	
@@ -650,11 +639,8 @@ void CMyApp::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_saturn_ringTextureID);
 
-	// Szarturnusz pozíciója: 
-	matWorld = glm::translate<float>(glm::vec3(7.35f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-26.73f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(1.5f, 1.0f, 1.5f)) * glm::identity<glm::mat4>();
-
+	Orb saturnRing(7.35f, 1.5f, 26.73f, 10753.f, 0.f);
+	matWorld = saturnRing.GenTransformMatrix(m_ElapsedTimeInSec);
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
@@ -668,10 +654,8 @@ void CMyApp::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_uranus_ringTextureID);
 
-	// Uránusz pozíciója: 
-	matWorld = glm::translate<float>(glm::vec3(8.25f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-97.77f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale<float>(glm::vec3(0.85f, 1.0f, 0.85f)) * glm::identity<glm::mat4>();
+	Orb uranusRing(8.25f, 0.85f, 97.77f, 30664.f, 0.f);
+	matWorld = uranusRing.GenTransformMatrix(m_ElapsedTimeInSec);
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
@@ -685,10 +669,8 @@ void CMyApp::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_neptune_ringTextureID);
 
-	// Neptunusz pozíciója: 
-	matWorld = glm::translate<float>(glm::vec3(9.26f, 0.0f, 0.0f))
-		* glm::rotate<float>(glm::radians(-28.32f), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::identity<glm::mat4>();
+	Orb neptuneRing(9.26f, 1.0f, 28.32f, 60148.f, 0.66f);
+	matWorld = neptuneRing.GenTransformMatrix(m_ElapsedTimeInSec);
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
