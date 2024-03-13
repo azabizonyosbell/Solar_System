@@ -616,9 +616,11 @@ void CMyApp::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_asteroidTextureID);
 
-	matWorld = glm::translate<float>(glm::vec3(4.5f, 0.0f, 0.0f))
-		* glm::scale<float>(glm::vec3(0.05f, 0.05f, 0.05f))
-		* glm::identity<glm::mat4>();
+	Orb asteroid(4.5f, 0.05f, 0.f, 110.f, 0.0f);
+	matWorld = asteroid.GenTransformMatrix(m_ElapsedTimeInSec)
+		* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec* (30.f)), glm::vec3(1.0, 0.0, 0.0))
+		* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec* (30.f)), glm::vec3(0.0, 1.0, 0.0))
+		* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec* (30.f)), glm::vec3(0.0, 0.0, 1.0));
 
 	glUniformMatrix4fv(ul("world"), 1, GL_FALSE, glm::value_ptr(matWorld));
 	glUniformMatrix4fv(ul("worldIT"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(matWorld))));
