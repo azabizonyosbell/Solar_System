@@ -10,6 +10,7 @@ out vec4 fs_out_col;
 
 // textúra mintavételező objektum
 uniform sampler2D texImage;
+uniform sampler2D texImageNight;
 
 // kamera pozíció
 uniform vec3 cameraPos;
@@ -17,21 +18,24 @@ uniform vec3 cameraPos;
 // fenyforras tulajdonsagok
  uniform vec4 lightPos;
 
- uniform vec3 La = vec3(1.0, 1.0, 1.0 );
- uniform vec3 Ld = vec3(1.0, 1.0, 1.0 );
- uniform vec3 Ls = vec3(1.0, 1.0, 1.0 );
+ uniform vec3 La;
+ uniform vec3 Ld;
+ uniform vec3 Ls;
 
-uniform float lightConstantAttenuation    = 1.0;
-uniform float lightLinearAttenuation      = 2.0;
-uniform float lightQuadraticAttenuation   = 0.0;
+uniform float lightConstantAttenuation;
+uniform float lightLinearAttenuation;
+uniform float lightQuadraticAttenuation;
 
 // anyag tulajdonsagok
 
- uniform vec3 Ka = vec3( 1.0 );
- uniform vec3 Kd = vec3( 1.0 );
- uniform vec3 Ks = vec3( 1.0 );
+ uniform vec3 Ka;
+ uniform vec3 Kd;
+ uniform vec3 Ks;
 
- uniform float Shininess = 80.0;
+ uniform float Shininess;
+
+ // éjszakai Földhöz
+ uniform int isEarth; 
 
 
 /* segítség:
@@ -59,8 +63,18 @@ void main()
 	vec3 r = reflect(normalize(-toLight),normal);
 	vec3 specular = pow(clamp(dot(normalize(r),toEye),0,1),Shininess) * Ks * Ls;
 
+	float attenuation = 1.0 / (lightConstantAttenuation
+			+ lightLinearAttenuation * length(lightPos - vs_out_pos)
+			/*+ lightQuadraticAttenuation * pow(length(lightPos - vs_out_pos), 2.0)*/);
+
 	// normal vector debug:
 	// fs_out_col = vec4( normal * 0.5 + 0.5, 1.0 );
 
-	fs_out_col = vec4((ambient + diffuse + specular),1) + texture(texImage, vs_out_tex);
+	if(isEarth == 1){
+	fs_out_col = vec4((ambient + diffuse + specular),1) * texture(texImage, vs_out_tex)
+			+ (1- diffuse) * texture(texImageNight, vs_out_tex);
+	}
+	else{
+	fs_out_col = vec4((ambient + diffuse + specular),1) * texture(texImage, vs_out_tex);
+	}
 }

@@ -219,16 +219,6 @@ void CMyApp::CleanSkyboxGeometry()
 
 void CMyApp::InitTextures()
 {
-	// diffuse textures
-
-/*	glGenTextures(1, &m_SuzanneTextureID);
-	TextureFromFile( m_SuzanneTextureID, "Assets/wood.jpg" );
-	SetupTextureSampling( GL_TEXTURE_2D, m_SuzanneTextureID );
-
-	glGenTextures( 1, &m_surfaceTextureID );
-	TextureFromFile( m_surfaceTextureID, "Assets/color_checkerboard.png" );
-	SetupTextureSampling( GL_TEXTURE_2D, m_surfaceTextureID );*/
-
 	// skybox texture
 
 	InitSkyboxTextures();
@@ -253,6 +243,11 @@ void CMyApp::InitTextures()
 	glGenTextures(1, &m_earthTextureID);
 	TextureFromFile(m_earthTextureID, "Assets/earth.png");
 	SetupTextureSampling(GL_TEXTURE_2D, m_earthTextureID);
+
+	//earth-night.jpg – A Föld éjszakai oldalának textúrája
+	glGenTextures(2, &m_earthNightTextureID);
+	TextureFromFile(m_earthNightTextureID, "Assets/earth-night.jpg");
+	SetupTextureSampling(GL_TEXTURE_2D, m_earthNightTextureID);
 
 	//moon.jpg – Hold textúrája
 	glGenTextures(1, &m_moonTextureID);
@@ -323,6 +318,7 @@ void CMyApp::CleanTextures()
 	glDeleteTextures(1, &m_mercuryTextureID);
 	glDeleteTextures(1, &m_venusTextureID);
 	glDeleteTextures(1, &m_earthTextureID);
+	glDeleteTextures(1, &m_earthNightTextureID);
 	glDeleteTextures(1, &m_moonTextureID);
 	glDeleteTextures(1, &m_marsTextureID);
 	glDeleteTextures(1, &m_jupiterTextureID);
@@ -446,10 +442,15 @@ void CMyApp::Render()
 
 	glUniform1f( ul( "Shininess" ),	m_Shininess );
 
+	glUniform1i(ul("isEarth"), m_isEarth);
+
 	// Nap
 	// középpont: (0.0, 0.0, 0.0); sugár: 1.0;
 	// forgástengely: 7.25 deg
 
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_earthNightTextureID);
+	
 	glActiveTexture(GL_TEXTURE0);
 
 	matWorld = glm::rotate<float>(glm::radians(-7.25f), glm::vec3(0.0f, 0.0f, 1.0f))
@@ -477,9 +478,18 @@ void CMyApp::Render()
 	// Felszíne legyen 3 egységre a Nap felszínétől; surgár: 0.2;
 	// 3 + 1 + 0.2 = 4.2
 	// forgástengely: 23.44 fok
-	Orb earth(4.2f, 0.2f, 23.44f, 365.f, 1.f);
+
+	glUniform1i(ul("isEarth"), 1);
+
+	//mintavételező beállítása
+	glUniform1i(ul("texImage"), 0); 
+	glUniform1i(ul("texImageNight"), 1);
+
+	Orb earth(4.2f, 0.2f, 203.44f, 365.f, 1.f);
 	matWorld = earth.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_earthTextureID);
+
+	glUniform1i(ul("isEarth"), 0);
 
 	// Hold
 	// Felszíne legyen 0.2 egységre a Fökld felszínétől; surgár: Föld méretének 1 / 3 része
@@ -541,7 +551,14 @@ void CMyApp::Render()
 	Orb pluto(10.1f, 0.1f, 119.61f, 90520.f, 6.37f);
 	matWorld = pluto.GenTransformMatrix(m_ElapsedTimeInSec);
 	RenderPlanet(matWorld, m_plutoTextureID);
-	
+
+
+	// shader kikapcsolasa
+	glUseProgram(0);
+
+	// - Textúra kikapcsolása
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	
 	//
 	// skybox

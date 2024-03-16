@@ -72,17 +72,17 @@ protected:
 	// Fényforrás- ...
 	glm::vec4 m_lightPos = glm::vec4( 0.0f, 0.0f, 0.0f, 0.0f );
 
-	glm::vec3 m_La = glm::vec3( 0.9, 0.9, 0.9 );
-	glm::vec3 m_Ld = glm::vec3( 0.9, 0.9, 0.9 );
-	glm::vec3 m_Ls = glm::vec3( 0.9, 0.9, 0.9 );
+	glm::vec3 m_La = glm::vec3( 0.85, 0.8, 0.8 );
+	glm::vec3 m_Ld = glm::vec3( 0.85, 0.8, 0.8 );
+	glm::vec3 m_Ls = glm::vec3( 0.85, 0.8, 0.8 );
 
 	float m_lightConstantAttenuation    = 1.0;
-	float m_lightLinearAttenuation      = 0.0;
+	float m_lightLinearAttenuation      = 0.5;
 	float m_lightQuadraticAttenuation   = 0.0;
 
 	// ... és anyagjellemzők
-	glm::vec3 m_Ka = glm::vec3( 0.125 );
-	glm::vec3 m_Kd = glm::vec3( 0.5 );
+	glm::vec3 m_Ka = glm::vec3( 0.1 );
+	glm::vec3 m_Kd = glm::vec3( 1.0 );
 	glm::vec3 m_Ks = glm::vec3( 0.9 );
 
 	float m_Shininess = 80.0;
@@ -118,6 +118,7 @@ protected:
 	GLuint m_mercuryTextureID = 0;
 	GLuint m_venusTextureID = 0;
 	GLuint m_earthTextureID = 0;
+	GLuint m_earthNightTextureID = 0;
 	GLuint m_moonTextureID = 0;
 	GLuint m_marsTextureID = 0;
 	GLuint m_jupiterTextureID = 0;
@@ -132,6 +133,9 @@ protected:
 	GLuint m_neptune_ringTextureID = 0;
 
 	GLuint m_asteroidTextureID = 0;
+
+	// éjszakai Földhöz
+	int m_isEarth = 0;
 
 	void InitTextures();
 	void CleanTextures();
