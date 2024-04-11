@@ -137,6 +137,9 @@ protected:
 	// éjszakai Földhöz
 	int m_isEarth = 0;
 
+	// Nap
+	int m_isSun = 0;
+
 	void InitTextures();
 	void CleanTextures();
 	void InitSkyboxTextures();

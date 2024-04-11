@@ -444,6 +444,8 @@ void CMyApp::Render()
 
 	glUniform1i(ul("isEarth"), m_isEarth);
 
+	glUniform1i(ul("isSun"), m_isSun);
+
 	// Nap
 	// középpont: (0.0, 0.0, 0.0); sugár: 1.0;
 	// forgástengely: 7.25 deg
@@ -453,10 +455,15 @@ void CMyApp::Render()
 	
 	glActiveTexture(GL_TEXTURE0);
 
+	glUniform1i(ul("isSun"), 1);
+
 	matWorld = glm::rotate<float>(glm::radians(-7.25f), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::rotate<float>(glm::radians(m_ElapsedTimeInSec * (360.f / 27.f)), glm::vec3(0.0, 1.0, 0.0))
 		* glm::identity<glm::mat4>();
 	RenderPlanet(matWorld, m_sunTextureID);
+
+	glUniform1i(ul("isSun"), 0);
+	glUniform1i(ul("isSun"), 0);
 
 	// Merkúr
 	// Felszíne legyen 1 egységre a Nap felszínétől; surgár: 0.15;

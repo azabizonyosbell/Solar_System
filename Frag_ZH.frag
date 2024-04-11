@@ -34,8 +34,11 @@ uniform float lightQuadraticAttenuation;
 
  uniform float Shininess;
 
- // éjszakai Földhöz
+// éjszakai Földhöz
  uniform int isEarth; 
+
+// Nap
+ uniform int isSun; 
 
 
 /* segítség:
@@ -73,6 +76,9 @@ void main()
 	if(isEarth == 1){
 	fs_out_col = vec4((ambient + diffuse + specular),1) * texture(texImage, vs_out_tex)
 			+ (1- diffuse) * texture(texImageNight, vs_out_tex);
+	}
+	else if (isSun ==1){
+	fs_out_col = texture(texImage, vs_out_tex);
 	}
 	else{
 	fs_out_col = vec4((ambient + diffuse + specular),1) * texture(texImage, vs_out_tex);
